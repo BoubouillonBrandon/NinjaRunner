@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 public class PlayerController : MonoBehaviour
 {
     private float horizontal;
@@ -9,7 +10,6 @@ public class PlayerController : MonoBehaviour
     public float jumpingPower = 16f;
     private bool isFacingRight = true;
     private Animator anim;
-    public GameObject attackPoint;
     public float radius;
     public LayerMask Ennemie;
     public GameObject Ennemies;
@@ -57,14 +57,25 @@ public class PlayerController : MonoBehaviour
     private bool levelCompleted;
 
    
-    public float goldTime = 30.0f;
-    public float silverTime = 60.0f;
+    public float goldTime = 7.0f;
+    public float silverTime = 12.0f;
 
+    public Image I_Bronze;
+
+    public Image I_Argent;
+
+    public Image I_Or;
+    public Canvas canvasNiveauFini;
+    public GameObject NiveauSuivant;
+    public Image Cadenas;
     void Start()
     {
         enemies = GameObject.FindGameObjectsWithTag("Ennemies");
          levelTime = 0f;
         levelCompleted = false;
+        canvasNiveauFini.enabled = false;
+       
+
     }
     void Update()
     {
@@ -187,7 +198,7 @@ public class PlayerController : MonoBehaviour
 
     void UpdateTimerDisplay()
     {
-        // Afficher le temps sous forme de minutes et secondes
+  
         int minutes = Mathf.FloorToInt(levelTime / 60F);
         int seconds = Mathf.FloorToInt(levelTime % 60F);
         timerText.text = string.Format("{0:0}:{1:00}", minutes, seconds);
@@ -203,18 +214,18 @@ public class PlayerController : MonoBehaviour
     {
         if (levelTime < goldTime)
         {
-            medalText.text = "Medal: Gold";
-            // Ajouter une logique pour donner une médaille d'or
+            medalText.text = "Medaille D'Or";
+           
         }
         else if (levelTime < silverTime)
         {
-            medalText.text = "Medal: Silver";
-            // Ajouter une logique pour donner une médaille d'argent
+            medalText.text = "Medaille D'Argent";
+           
         }
         else
         {
-            medalText.text = "Medal: Bronze";
-            // Ajouter une logique pour donner une médaille de bronze
+            medalText.text = "Medaille De Bronze";
+           
         }
     }
 
@@ -235,8 +246,27 @@ public class PlayerController : MonoBehaviour
     void PlayerWins()
     {
         
-        Debug.Log("You Win!");
-        
+
+        if (levelTime < goldTime)
+        {
+           I_Or.enabled = true;
+           
+        }
+        else if (levelTime < silverTime)
+        {
+            I_Argent.enabled = true;
+            NiveauSuivant.SetActive(true);
+        }
+        else
+        {
+            I_Bronze.enabled = true;
+            Cadenas.enabled = true;
+        }
+
+        canvasNiveauFini.enabled = true;
+
+        gameObject.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
+
     }
 
 
@@ -333,7 +363,7 @@ public class PlayerController : MonoBehaviour
 
             isWallSliding = true;
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue));
-            Debug.Log("ouoi");
+
         }
         else
         {
@@ -375,8 +405,54 @@ public class PlayerController : MonoBehaviour
             isWallJumping = false;
         }
 
+        public void NiveauSuivants()
+        {
+             string activeSceneName = SceneManager.GetActiveScene().name;
 
+            if (levelTime < silverTime || levelTime < goldTime)
+        {
+                 
+            if (activeSceneName == "LVL1")
+            {
+                SceneManager.LoadScene("LVL2");
+            }
+
+            if (activeSceneName == "LVL2")
+            {
+                SceneManager.LoadScene("LVL3");
+            }
+
+            if (activeSceneName == "LVL3")
+            {
+                SceneManager.LoadScene("LVL4");
+            }
+
+            if (activeSceneName == "LVL4")
+            {
+                SceneManager.LoadScene("LVL5");
+            }
+
+            if (activeSceneName == "LVL5")
+            {
+                SceneManager.LoadScene("Menu Principal");
+            }
+            
+        }
+
+        }
+        public void Quitter()
+    {
+        Application.Quit();
+    }
+       
+
+        
   
+        public void Recommancer()
+                {
+                    string activeSceneName = SceneManager.GetActiveScene().name;
 
+                    SceneManager.LoadScene(activeSceneName);
+                }
 
 }
